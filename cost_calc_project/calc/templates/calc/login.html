@@ -1,0 +1,16 @@
+{% extends 'calc/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 2rem auto;">
+    <h2>Вход в систему</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p><input type="text" name="username" placeholder="Логин" style="width: 100%; padding: 10px; margin: 10px 0;"></p>
+        <p><input type="password" name="password" placeholder="Пароль" style="width: 100%; padding: 10px; margin: 10px 0;"></p>
+        <button type="submit" class="btn" style="width: 100%;">Войти</button>
+    </form>
+    <p style="margin-top: 1rem; text-align: center;">
+        <small>Используйте учетные данные из админ-панели</small>
+    </p>
+</div>
+{% endblock %}

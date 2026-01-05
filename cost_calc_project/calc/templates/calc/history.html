@@ -1,0 +1,51 @@
+{% extends 'calc/base.html' %}
+
+{% block title %}История расчетов - Mozza{% endblock %}
+
+{% block content %}
+<h2>История всех расчетов себестоимости</h2>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Дата расчета</th>
+                <th>Блюдо</th>
+                <th>Себестоимость ингредиентов</th>
+                <th>Накладные расходы</th>
+                <th>Полная себестоимость</th>
+                <th>Примечание</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for calc in calculations %}
+            <tr>
+                <td>{{ calc.calculation_date|date:"d.m.Y H:i" }}</td>
+                <td>{{ calc.dish.name }}</td>
+                <td>{{ calc.portion_cost|floatformat:2 }} руб.</td>
+                <td>{{ calc.overhead_per_portion|floatformat:2 }} руб.</td>
+                <td><strong>{{ calc.total_cost|floatformat:2 }} руб.</strong></td>
+                <td>{{ calc.note|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Нет сохраненных расчетов</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Статистика</h3>
+    <p>Всего сохранено расчетов: <strong>{{ calculations|length }}</strong></p>
+    <p>Период: 
+        {% if calculations %}
+            с {{ calculations.last.calculation_date|date:"d.m.Y" }} по {{ calculations.first.calculation_date|date:"d.m.Y" }}
+        {% else %}
+            нет данных
+        {% endif %}
+    </p>
+    <a href="{% url 'dish_list' %}" class="btn">Вернуться к расчетам</a>
+</div>
+{% endblock %}

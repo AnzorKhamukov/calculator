@@ -1,0 +1,67 @@
+{% extends 'calc/base.html' %}
+
+{% block title %}Расчет себестоимости - {{ dish.name }}{% endblock %}
+
+{% block content %}
+<h2>{{ dish.name }}</h2>
+<p><strong>Описание:</strong> {{ dish.description|default:"-" }}</p>
+<p><strong>Выход:</strong> {{ dish.output_quantity }} {{ dish.output_unit.short_name }}</p>
+
+<div class="card">
+    <h3>Состав и расчет стоимости ингредиентов</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Ингредиент</th>
+                <th>Количество на порцию</th>
+                <th>Ед. изм.</th>
+                <th>Цена за ед., руб.</th>
+                <th>Потери, %</th>
+                <th>Стоимость, руб.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comp in compositions %}
+            <tr>
+                <td>{{ comp.ingredient.name }}</td>
+                <td>{{ comp.quantity }}</td>
+                <td>{{ comp.ingredient.unit.short_name }}</td>
+                <td>{{ comp.ingredient.current_price }}</td>
+                <td>{{ comp.losses_percent }}</td>
+                <td>{{ comp.ingredient_cost|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Состав не указан</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="background: #f8f9fa; font-weight: bold;">
+                <td colspan="5">ИТОГО по ингредиентам:</td>
+                <td>{{ ingredient_cost|floatformat:2 }} руб.</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Накладные расходы</h3>
+    <p>Общие накладные расходы (аренда, коммуналка, зарплата и т.д.) распределяются равномерно на все активные блюда.</p>
+    <p><strong>Накладные расходы на это блюдо:</strong> {{ overhead_per_dish|floatformat:2 }} руб.</p>
+</div>
+
+<div class="card" style="background: #e8f4fd;">
+    <h2>Итоговая себестоимость</h2>
+    <div class="cost-display">
+        {{ total_cost|floatformat:2 }} руб. за {{ dish.output_quantity }} {{ dish.output_unit.short_name }}
+    </div>
+    <p><small>Стоимость ингредиентов: {{ ingredient_cost|floatformat:2 }} руб. + Накладные: {{ overhead_per_dish|floatformat:2 }} руб.</small></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Сохранить расчет в историю</button>
+        <a href="{% url 'dish_list' %}" class="btn">Вернуться к списку</a>
+    </form>
+</div>
+{% endblock %}
